@@ -2,9 +2,9 @@ import os
 from slackclient import SlackClient
 
 
-BOT_NAME = 'silver'
+BOT_NAME = 'bananabot'
 
-slack_client = SlackClient('xoxb-81301743842-gdwmW92U9o4YLCkWlloqyK9i')
+slack_client = SlackClient('xoxb-100949172436-Mnko99U0sJryXKJ5NGhwrE1f')
 
 
 if __name__ == "__main__":
