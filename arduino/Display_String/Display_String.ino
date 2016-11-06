@@ -15,6 +15,9 @@ int templist[128] = {0};
 int bluelist[128] = {0};
 int greenlist[128] = {0};
 
+bool showgreen = false;
+int count = 0;
+
 int bluesize = 0;
 int greensize = 0;
 int index = 0;
@@ -127,12 +130,20 @@ delay(charBreak);
 
 void displayString(){              // int is length of string, should be one less that total length 
 
-//   for (int i = 1; i < greensize; i++){    // print green
-//      displayChar(greenlist[i], 1);
-//    }
+  if(showgreen){
+   for (int i = 1; i < greensize; i++){    // print green
+      displayChar(greenlist[i], 1);
+    }
+  } else {
     for (int i = 1; i < bluesize; i++){          // print blue
       displayChar(bluelist[i], 0);
     }
+  }  
+  count++;
+  if(count > 75){
+    showgreen = !showgreen;
+    count = 0;
+  }
 }
 
 void strtodec() {                         // sets charlist to a specific string
@@ -179,11 +190,13 @@ void loop(){
                     for(int i = 0; i < 256; i++) {  // iterates through templist
                       greenlist[i] = templist[i];   // copy templist to charlist to have repeat as current string
                     }
+                    showgreen = true;
                     greensize = index;               // copy index to greensize to get length of the green string for iteration
                   } else {
                     for(int i = 0; i < 128; i++) {
                       bluelist[i] = templist[i];   
                     }
+                    showgreen = false;
                     bluesize = index;               // copy index to bluesize to get length of the blue string for iteration
                   }                                 
                   index = 0;                        // reset index to zero
@@ -194,6 +207,3 @@ void loop(){
           delay(10);
         }
 }
-
-
-

@@ -11,8 +11,8 @@ from pprint import pprint
 # Arduino Integration
 from time import sleep
 import serial
-switch = false
-ser = serial.Serial('/dev/tty.usbmodem1d11', 9600) # Establish the connection on a specific port
+switch = False
+ser = serial.Serial('/dev/ttyACM0', 9600) # Establish the connection on a specific port
  # Convert the decimal number to ASCII then send it to the Arduino
 
 
@@ -105,6 +105,7 @@ def get_channels(bot_id):
 
 def filter_all(message_stats):
     global CHANNEL_MAP
+    global switch
 
     if not 'user' in message_stats:
         return
@@ -118,13 +119,12 @@ def filter_all(message_stats):
 
         # print(message_stats['text'])
         # hello world
-
-        if (!switch):
-            ser.write('b' + message_stats['text'] + 'z')
-            switch = true
-        else:
-            ser.write('g' + message_stats['text'] + 'z')
-            switch = false
+        if not switch:
+            ser.write(str('b' + message_stats['text'].upper() + 'z').encode('ascii'))
+            switch = True
+        else: 
+            ser.write(str('g' + message_stats['text'].upper() + 'z').encode('ascii'))
+            switch = False
         gif_count, message_count, user_map = CHANNEL_MAP[channel]
 
         if '/giphy' in message:
