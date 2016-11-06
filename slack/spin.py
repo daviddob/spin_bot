@@ -8,6 +8,15 @@ import datetime
 from slackclient import SlackClient
 from pprint import pprint
 
+# Arduino Integration
+from time import sleep
+import serial
+switch = false
+ser = serial.Serial('/dev/tty.usbmodem1d11', 9600) # Establish the connection on a specific port
+ # Convert the decimal number to ASCII then send it to the Arduino
+
+
+
 BOT_NAME = 'revlis'
 
 CHANNEL_ARRAY = []
@@ -18,6 +27,40 @@ BOT_ID = 'U2YTX52CU'
 AT_BOT = "<@" + BOT_ID + ">"
 
 CONFIG = 'config.json'
+
+# def is_int(val):
+#     '''
+#         Helper fucntion to determain whether or not a string is a number.
+#     '''
+#     try:
+#         if val.isdigit():
+#             #print("Val is true: " + val)
+#             return True
+#     except AttributeError:
+#         #print("Val is false: " + val)
+#         return False
+#
+# def is_sudoer(user):
+#     with open(CONFIG, 'r') as config_file:
+#         config_json = json.load(config_file)
+#
+#         for sudoer in config_json['sudoers']['members']:
+#             #print(sudoer)
+#             if user == sudoer:
+#                 return True
+#         return False
+#
+# def add_sudoer(user):
+#     with open(CONFIG, 'r+') as config_file:
+#         config_json = json.load(config_file)
+#
+#         config_json['sudoers']['members'].append(user)
+#
+#         config_file.seek(0)
+#         json.dump(config_json, config_file, indent=4)
+#
+#     SLACK_CLIENT.api_call("chat.postMessage", channel=channel, text='<@'+user+'> has been added to sudoers.', username=BOT_NAME)
+
 
 def get_channels(bot_id):
     channel_list = SLACK_CLIENT.api_call('channels.list')
@@ -48,11 +91,17 @@ def get_channels(bot_id):
             group_id = group['id']
             group_info = SLACK_CLIENT.api_call('groups.info', channel=group_id)
 
+            #print(group_info)
+
             for member in group_info['group']['members']:
                 if BOT_ID == member:
+                    #print('found him! in ' + group_info['group']['name'])
                     bot_channels.append(group_id)
 
     return bot_channels
+
+# def delete_message(channel, ts):
+#     SLACK_CLIENT.api_call('chat.delete', ts=ts, channel=channel)
 
 def filter_all(message_stats):
     global CHANNEL_MAP
@@ -66,11 +115,26 @@ def filter_all(message_stats):
     user = message_stats['user']
 
     if channel in CHANNEL_MAP:
+
+        # print(message_stats['text'])
+        # hello world
+
+        if (!switch):
+            ser.write('b' + message_stats['text'] + 'z')
+            switch = true
+        else:
+            ser.write('g' + message_stats['text'] + 'z')
+            switch = false
         gif_count, message_count, user_map = CHANNEL_MAP[channel]
 
         if '/giphy' in message:
             giphy_link = message_stats['attachments'][0]['image_url']
             os.system("wget " + giphy_link + " -O newest.gif")
+            # if gif_count > 2:
+            #     delete_message(channel, ts)
+            # else:
+            #     gif_count += 1
+            #     CHANNEL_MAP[channel] = gif_count, message_count, user_map
         else:
             if message_count > 6:
                 gif_count = 0
@@ -83,7 +147,7 @@ def filter_all(message_stats):
                 if user_map[user] == message:
                     #print('delete message at ts')
                     message_count -= 1
-                    delete_message(channel, ts)
+      #              delete_message(channel, ts)
                 else:
                     user_map[user] = message
             else:
@@ -94,11 +158,24 @@ def filter_all(message_stats):
         CHANNEL_MAP[channel] = 0, 0, {}
         #print(CHANNEL_MAP)
 
+# def get_user_from_command(command):
+#     try:
+#         user = command.split('@')[1][:-1].upper()
+#         return user
+#     except IndexError:
+#         #print('wrong format')
+#         return
+#
+# def kick_user(channel, user):
+#     #print(user)
+#     SLACK_CLIENT.api_call('groups.kick', channel=channel, user=user)
+
 def slack_commands_list(command, channel, user):
     global CHANNEL_ARRAY
 
     if command.startswith('sudo ') and is_sudoer(user):
         sudo_command = command.split(' ', 1)[1]
+        #print(sudo_command)
 
         if sudo_command.startswith('kick '):
             user = get_user_from_command(command)
@@ -142,9 +219,8 @@ def parse_slack_output(slack_rtm_output):
 if __name__ == "__main__":
     READ_WEBSOCKET_DELAY = 1 # 1 second delay between reading from firehose
     if SLACK_CLIENT.rtm_connect():
-        print("Bananabot connected and running!")
+
         CHANNEL_ARRAY = get_channels(BOT_ID)
-        print(_ARRAY)
 
         while True:
 
@@ -161,9 +237,15 @@ if __name__ == "__main__":
                     slack_commands_list(command, channel, user)
                 else:
                     if channel in CHANNEL_ARRAY:
+                        # print(command, channel, user, ts)
                         filter_all(message_stats)
+
+
             else:
                 None
+
+            # print(CHANNEL_ARRAY)
+
             time.sleep(READ_WEBSOCKET_DELAY)
     else:
         print("Connection failed. Invalid Slack token or bot ID?")
