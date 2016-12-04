@@ -1,12 +1,13 @@
-int ledpin = 9;
-int serialVal=0;
+int ledPin = 8;
+char serialVal;
 void setup() {
   Serial.begin(9600);
-  pinMode(ledpin, OUTPUT);
+  pinMode(ledPin, OUTPUT);
+  digitalWrite(ledPin, HIGH);
 }
 
 void loop() {
-  
+   
   // if data is available to read
   if( Serial.available() ){
     serialVal = Serial.read();         
@@ -15,12 +16,12 @@ void loop() {
   // if 'H' was received
   if( serialVal == 'H' ){
     // turn ON the LED
-    digitalWrite(ledpin, HIGH);  
+    digitalWrite(ledPin, HIGH);  
   } 
   else{ 
     // otherwise turn it OFF
-    digitalWrite(ledpin, LOW);   
+    digitalWrite(ledPin, LOW);   
   }
   
-  delay(100);      
+  delay(1000);      
 }
