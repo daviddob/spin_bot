@@ -4,6 +4,7 @@ import time
 import json
 import time
 import datetime
+import sys
 
 from slackclient import SlackClient
 from pprint import pprint
@@ -12,7 +13,14 @@ from pprint import pprint
 from time import sleep
 import serial
 switch = False
-ser = serial.Serial('/dev/tty.HB-01-DevB-1', 9600) # Establish the connection on a specific port
+os.system('ls /dev/tty.* > bt.txt')
+with open('bt.txt') as txt:
+    for line in txt:
+        pass
+        last = line
+    bluetooth = line[:-1]
+os.system('rm bt.txt')
+ser = serial.Serial(bluetooth, 9600) # Establish the connection on a specific port
  # Convert the decimal number to ASCII then send it to the Arduino
 
 
@@ -217,6 +225,8 @@ def parse_slack_output(slack_rtm_output):
 
 
 if __name__ == "__main__":
+
+
     READ_WEBSOCKET_DELAY = 1 # 1 second delay between reading from firehose
     if SLACK_CLIENT.rtm_connect():
 
