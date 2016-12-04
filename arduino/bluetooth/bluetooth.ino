@@ -1,5 +1,5 @@
 int ledPin = 8;
-char serialVal;
+char serialVal ;
 void setup() {
   Serial.begin(9600);
   pinMode(ledPin, OUTPUT);
