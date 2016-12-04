@@ -12,7 +12,7 @@ from pprint import pprint
 from time import sleep
 import serial
 switch = False
-ser = serial.Serial('/dev/ttyACM0', 9600) # Establish the connection on a specific port
+ser = serial.Serial('/dev/tty.HB-01-DevB-1', 9600) # Establish the connection on a specific port
  # Convert the decimal number to ASCII then send it to the Arduino
 
 
@@ -122,7 +122,7 @@ def filter_all(message_stats):
         if not switch:
             ser.write(str('b' + message_stats['text'].upper() + 'z').encode('ascii'))
             switch = True
-        else: 
+        else:
             ser.write(str('g' + message_stats['text'].upper() + 'z').encode('ascii'))
             switch = False
         gif_count, message_count, user_map = CHANNEL_MAP[channel]
