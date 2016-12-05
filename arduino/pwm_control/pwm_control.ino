@@ -8,8 +8,9 @@ void setup() {
 }
 
 void loop() {
-  speed = 60;
-  if(speed < 174) {
-    analogWrite(pin, speed);
-  }
+  //SPEEDS THAT WORK FROM LOW TO HIGH: starts quick around 5, 
+  //slows down until 60 which is a complete stop, 
+  //at 75 starts again and speeds up until about 130 ish which is max speed
+  speed = 50;
+  analogWrite(pin, speed);
 }
