@@ -8,8 +8,8 @@ void setup() {
 }
 
 void loop() {
-  speed = 177;
-  if(speed > 174) {
+  speed = 60;
+  if(speed < 174) {
     analogWrite(pin, speed);
   }
 }
